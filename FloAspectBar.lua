@@ -103,8 +103,7 @@ function FloAspectBar_OnEvent(self, event, arg1, ...)
 		FloLib_UpdateBindings(self, "SHAPESHIFT");
 
 	elseif event == "UNIT_AURA" then
-		local unit = ...;
-		if unit == PlayerFrame.unit then
+		if arg1 == PlayerFrame.unit then
 			FloLib_UpdateState(self);
 		end
 
@@ -200,10 +199,10 @@ function FloAspectBar_UpdateState(self, pos)
 	local button = _G[self:GetName().."Button"..pos];
 	local spell = self.spells[pos];
 
-	if UnitAura(PlayerFrame.unit, spell.name, nil, "PLAYER") then
-		button:SetChecked(1);
+	if UnitBuff("player", spell.name) then
+		button:SetChecked(true);
 	else
-		button:SetChecked(0);
+		button:SetChecked(false);
 	end
 end
 
