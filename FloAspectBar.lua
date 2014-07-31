@@ -86,7 +86,7 @@ function FloAspectBar_OnEvent(self, event, arg1, ...)
 
 		-- Hook the UIParent_ManageFramePositions function
 		hooksecurefunc("UIParent_ManageFramePositions", FloAspectBar_UpdatePosition);
-		hooksecurefunc("SetActiveTalentGroup", function() changingSpec = true; end);
+		hooksecurefunc("SetActiveSpecGroup", function() changingSpec = true; end);
 
 	elseif event == "UNIT_SPELLCAST_INTERRUPTED" then
 		local spellName = ...;
