@@ -58,26 +58,30 @@ function FloAspectBar_OnLoad(self)
 		SLASH_FLOASPECTBAR2 = "/fab";
 		SlashCmdList["FLOASPECTBAR"] = FloAspectBar_ReadCmd;
 
-		self:RegisterEvent("VARIABLES_LOADED");
+		self:RegisterEvent("ADDON_LOADED");
 		self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED");
 		self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED");
 	end
 
 	self:RegisterEvent("PLAYER_ENTERING_WORLD");
 	self:RegisterEvent("LEARNED_SPELL_IN_TAB");
+	self:RegisterEvent("CHARACTER_POINTS_CHANGED");
+	self:RegisterEvent("PLAYER_ALIVE");
+	self:RegisterEvent("PLAYER_LEVEL_UP");
 	self:RegisterEvent("SPELL_UPDATE_COOLDOWN");
-	self:RegisterEvent("SPELL_UPDATE_USABLE");
+	self:RegisterEvent("ACTIONBAR_UPDATE_USABLE");
 	self:RegisterEvent("UNIT_AURA");
 	self:RegisterEvent("UPDATE_BINDINGS");
 end
 
-function FloAspectBar_OnEvent(self, event, ...)
+function FloAspectBar_OnEvent(self, event, arg1, ...)
 
-	if event == "PLAYER_ENTERING_WORLD" or event == "LEARNED_SPELL_IN_TAB" then
-		FloLib_Setup(self);
+	if event == "PLAYER_ENTERING_WORLD" or event == "LEARNED_SPELL_IN_TAB" or event == "PLAYER_ALIVE" or event == "PLAYER_LEVEL_UP" or event == "CHARACTER_POINTS_CHANGED" then
+		if not changingSpec then
+		        FloLib_Setup(self);
+                end
 
-	elseif event == "VARIABLES_LOADED" then
-
+	elseif event == "ADDON_LOADED" and arg1 == "FloAspectBar" then
 		FloAspectBar_CheckTalentGroup(FLOASPECTBAR_OPTIONS.active);
 
 		-- Hook the UIParent_ManageFramePositions function
@@ -91,7 +95,6 @@ function FloAspectBar_OnEvent(self, event, ...)
 		end
 
 	elseif event == "ACTIVE_TALENT_GROUP_CHANGED" then
-		local arg1 = ...;
 		if FLOASPECTBAR_OPTIONS.active ~= arg1 then
 			FloAspectBar_TalentGroupChanged(arg1);
 		end
@@ -176,10 +179,10 @@ function FloAspectBar_SetupSpell(self, spell, pos)
 
 	-- Avoid tainting
 	if not InCombatLockdown() then
-		local button, icon;
-
-		button = _G[self:GetName().."Button"..pos];
-		icon = _G[self:GetName().."Button"..pos.."Icon"];
+		local name, button, icon;
+		name = self:GetName();
+		button = _G[name.."Button"..pos];
+		icon = _G[name.."Button"..pos.."Icon"];
 
 		button:SetAttribute("type1", "spell");
 		button:SetAttribute("spell", spell.name);
@@ -188,6 +191,7 @@ function FloAspectBar_SetupSpell(self, spell, pos)
 	end
 
 	self.spells[pos] = { name = spell.name };
+	self.spells[pos] = { id = spell.id, name = spell.name, addName = spell.addName, talented = spell.talented };
 
 end
 
@@ -253,28 +257,34 @@ function FloAspectBar_SetPosition(self, bar, mode)
 	-- Close all dropdowns
 	CloseDropDownMenus();
 
-	bar.settings.position = mode;
-	DEFAULT_CHAT_FRAME:AddMessage(bar:GetName().." position "..mode);
+	if bar.settings then
+		local savePoints = bar.settings.position ~= mode;
+	        bar.settings.position = mode;
+	        DEFAULT_CHAT_FRAME:AddMessage(bar:GetName().." position "..mode);
 
-	if unlocked then
-		FloLib_ShowBorders(bar);
-		bar:RegisterForDrag("LeftButton");
-	else
-		if ACTIVE_OPTIONS.borders then
-			FloLib_ShowBorders(bar);
-		else
-			FloLib_HideBorders(bar);
-		end
-	end
+	        if unlocked then
+		        FloLib_ShowBorders(bar);
+		        bar:RegisterForDrag("LeftButton");
+	        else
+		        if ACTIVE_OPTIONS.borders then
+			        FloLib_ShowBorders(bar);
+		        else
+			        FloLib_HideBorders(bar);
+		        end
+	        end
 
-	if mode == "auto" then
-		-- Force the auto positionning
-		FloAspectBar_UpdatePosition(bar);
-	else
-		-- Force the game to remember position
-		bar:StartMoving();
-		bar:StopMovingOrSizing();
-	end
+	        if mode == "auto" then
+		        -- Force the auto positionning
+		        FloAspectBar_UpdatePosition(bar);
+	        else
+		        -- Force the game to remember position
+		        bar:StartMoving();
+		        bar:StopMovingOrSizing();
+			if savePoints then
+				bar.settings.refPoint = { bar:GetPoint() };
+			end
+	        end
+        end
 end
 
 function FloAspectBar_SetScale(scale)
