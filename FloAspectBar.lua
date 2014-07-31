@@ -2,12 +2,13 @@
 -- Constants
 -------------------------------------------------------------------------------
 
-local VERSION = "3.3.0.16"
+local VERSION = "6.0.17"
 
 -------------------------------------------------------------------------------
 -- Variables
 -------------------------------------------------------------------------------
 
+local _
 local SHOW_WELCOME = true;
 local FLOASPECTBAR_BARSETTINGS_DEFAULT = { position = "auto", buttonsOrder = {}, color = { 0, 0.49, 0, 0.7 }, hiddenSpells = {} };
 local FLOASPECTBAR_OPTIONS_DEFAULT = { [1] = { scale = 1, borders = true, barSettings = FLOASPECTBAR_BARSETTINGS_DEFAULT }, active = 1 };

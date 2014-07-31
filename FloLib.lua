@@ -1,9 +1,14 @@
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this file,
+-- You can obtain one at http://mozilla.org/MPL/2.0/.
+
 -- Some shared functions
 -- Prevent multi-loading
-if not FLOLIB_VERSION or FLOLIB_VERSION < 1.25 then
+if not FLOLIB_VERSION or FLOLIB_VERSION < 1.32 then
 
+local _
 local NUM_SPELL_SLOTS = 10;
-FLOLIB_VERSION = 1.25;
+FLOLIB_VERSION = 1.32;
 
 FLOLIB_ACTIVATE_SPEC_1 = GetSpellInfo(63645);
 FLOLIB_ACTIVATE_SPEC_2 = GetSpellInfo(63644);
@@ -13,13 +18,19 @@ StaticPopupDialogs["FLOLIB_CONFIRM_RESET"] = {
 	button1 = YES,
 	button2 = NO,
 	OnAccept = function(self, varName)
-		setglobal(varName, nil);
+		_G[varName] = nil;
 		ReloadUI();
 	end,
 	timeout = 0,
 	whileDead = 1,
 	hideOnEscape = 1,
 };
+
+-- Loads LibButtonFacade
+local LBF = nil;
+if LibStub then
+	LBF = LibStub('Masque', true);
+end
 
 -- Reset addon
 function FloLib_ResetAddon(addonName)
@@ -61,6 +72,7 @@ end
 -- Copy content of src into dst, preserve existing values, recursive
 function FloLib_CopyPreserve(src, dst)
 
+	local k, v;
 	for k, v in pairs(src) do
 		if dst[k] == nil then
 			if type(v) == "table" then
@@ -79,6 +91,8 @@ end
 function FloLib_Identity(n)
 
 	local tmp = {};
+	local i;
+
 	for i = 1, n do
 		tmp[i] = i;
 	end
@@ -90,7 +104,7 @@ end
 -- Swap 2 vals in an integer indexed array
 function FloLib_Swap(tab, val1, val2)
 
-	local idx1, idx2;
+	local idx1, idx2, i;
 	
 	for i = 1, #tab do
 		if tab[i] == val1 then
@@ -118,7 +132,7 @@ function FloLib_UpdateBindings(self, bindingPrefix)
 		return;
 	end
 
-	local key1, key2;
+	local key1, key2, i;
 	local buttonPrefix = self:GetName().."Button";
 
 	ClearOverrideBindings(self);
@@ -141,7 +155,7 @@ function FloLib_ReceiveDrag(self, releaseCursor)
 		return;
 	end
 
-	local cursorType, index, info;
+	local cursorType, index, info, i;
 
 	cursorType, index, info = GetCursorInfo();
 
@@ -150,7 +164,7 @@ function FloLib_ReceiveDrag(self, releaseCursor)
 	end
 
 	local button = self;
-	local newspell = GetSpellName(index, info);
+	local newspell = GetSpellBookItemName(index, info);
 	self = self:GetParent();
 
 	-- find the spell in the curent list
@@ -171,7 +185,7 @@ end
 function FloLib_GetTalentRank(talentName, tree)
 
 	local nt = GetNumTalents(tree);
-	local n, r, m;
+	local n, r, m, i;
 
 	for i = 1, nt do
 		n, _, _, _, r, m = GetTalentInfo(tree, i);
@@ -180,26 +194,6 @@ function FloLib_GetTalentRank(talentName, tree)
 		end
 	end
 	return 0, 0;
-end
-
--- Returns the ID of the last rank of a spell from the spellbook
-function FloLib_GetSpellId(spell)
-
-	local i = 1;
-	local valid = -1;
-	local validRank = nil;
-	local spellName, spellRank = GetSpellName(i, BOOKTYPE_SPELL)
-	while spellName do
-		if spellName == spell then
-			valid = i;
-			validRank = spellRank;
-		elseif valid > -1 then
-			return valid, validRank;
-		end
-		i = i + 1;
-		spellName, spellRank = GetSpellName(i, BOOKTYPE_SPELL)
-	end
-	return valid, validRank;
 end
 
 -- Show/hide a spell
@@ -226,18 +220,9 @@ function FloLib_Setup(self)
 	local button;
 	local isKnown, spell;
 	local i = 1;
-	local totemIdByName = nil;
+	local id, j, n;
 
 	self.spells = {};
-
-	-- Load totem ids
-	if self.slot then
-		local totemIds = {GetMultiCastTotemSpells(self.slot)};
-		totemIdByName = {};
-		for i, id in ipairs(totemIds) do
-			totemIdByName[GetSpellInfo(id)] = id;
-		end
-	end
 
 	-- Check already positionned spells
 	while self.settings.buttonsOrder[i] do
@@ -251,11 +236,9 @@ function FloLib_Setup(self)
 		end
 
 		if isKnown then
-			if not spell.name then
-				spell.name, _, spell.texture = GetSpellInfo(spell.id);
-			end
-			if totemIdByName then
-				spell.refId = totemIdByName[spell.name];
+			spell.name, spell.addName, spell.texture = GetSpellInfo(spell.id);
+			if spell.id2 and not spell.name2 then
+				spell.name2, spell.addName2, spell.texture2 = GetSpellInfo(spell.id2);
 			end
 			self:SetupSpell(spell, i);
 			i = i + 1;
@@ -277,11 +260,9 @@ function FloLib_Setup(self)
 		end
 
 		spell = self.availableSpells[n];
-		if not spell.name then
-			spell.name, _, spell.texture = GetSpellInfo(spell.id);
-		end
-		if totemIdByName then
-			spell.refId = totemIdByName[spell.name];
+		spell.name, spell.addName, spell.texture = GetSpellInfo(spell.id);
+		if spell.id2 and not spell.name2 then
+			spell.name2, spell.addName2, spell.texture2 = GetSpellInfo(spell.id2);
 		end
 
 		-- Check if this spell is already positionned
@@ -323,9 +304,18 @@ function FloLib_Setup(self)
 			self:Show();
 			self:SetWidth(numSpells * 35 + 12 + timerOffset);
 
-			for i=1, NUM_SPELL_SLOTS do
+			local group;
+			if LBF then
+				group = LBF:Group('FloTotemBar');
+			end
 
+			for i=1, NUM_SPELL_SLOTS do
 				button = _G[self:GetName().."Button"..i];
+				
+				-- Add the button to ButtonFacade
+				if group then
+					group:AddButton(button);
+				end
 
 				if i <= numSpells then
 					button:Show();
@@ -350,6 +340,8 @@ function FloLib_UpdateState(self)
 	local numSpells = #self.spells;
 	local spell, cooldown, normalTexture, icon;
 	local start, duration, enable, isUsable, noMana;
+	local start2, duration2, enable2;
+	local i;
 
 	for i=1, numSpells do
 
@@ -361,13 +353,23 @@ function FloLib_UpdateState(self)
 
 		--Cooldown stuffs
 		cooldown = _G[self:GetName().."Button"..i.."Cooldown"];
-		start, duration, enable = GetSpellCooldown(spell.name);
+		start, duration, enable = GetSpellCooldown(spell.id);
+		if spell.talented then
+			start2, duration2, enable2 = GetSpellCooldown(spell.talented);
+			if start > 0 and start2 > 0 then
+				start = math.min(start, start2);
+			else
+				start = start + start2;
+			end
+			duration = math.max(duration, duration2);
+		end
+
 		CooldownFrame_SetTimer(cooldown, start, duration, enable);
 
 		--Castable stuffs
 		normalTexture = _G[self:GetName().."Button"..i.."NormalTexture"];
 		icon = _G[self:GetName().."Button"..i.."Icon"];
-		isUsable, noMana = IsUsableSpell(spell.name);
+		isUsable, noMana = IsUsableSpell(spell.id);
 
 		if isUsable then
 			icon:SetVertexColor(1.0, 1.0, 1.0);
@@ -400,11 +402,7 @@ function FloLib_Button_SetTooltip(self)
 	local spell = self:GetParent().spells[self:GetID()];
 	if spell then
 		--Display the tooltip
-		local spellId, spellRank = FloLib_GetSpellId(spell.name)
-		GameTooltip:SetSpell(spellId, BOOKTYPE_SPELL);
-		GameTooltipTextRight1:SetText(spellRank);
-		GameTooltipTextRight1:SetTextColor(0.5, 0.5, 0.5);
-		GameTooltipTextRight1:Show();
+		GameTooltip:SetSpellByID(spell.id);
 		GameTooltip:Show();
 	end
 end
@@ -419,7 +417,7 @@ end
 
 function FloLib_BarDropDown_Initialize(frame, level, menuList)
 
-	local info;
+	local info, i, spell;
 	local bar = frame:GetParent();
 
 	-- If level 3

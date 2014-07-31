@@ -1,5 +1,9 @@
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this file,
+-- You can obtain one at http://mozilla.org/MPL/2.0/.
+
 -- Prevent multi-loading
-if not FLOLIB_VERSION or FLOLIB_VERSION < 1.25 then
+if not FLOLIB_VERSION or FLOLIB_VERSION < 1.32 then
 
 -------------------------------------------------------------------------------
 -- English localization (Default)
@@ -66,6 +70,13 @@ end
 
 if (GetLocale() == "ruRU") then
 
+FLOLIB_POSITION = "Позиция";
+FLOLIB_POSITIONS.unlock = "Освободить";
+FLOLIB_POSITIONS.lock = "Закрепить";
+FLOLIB_POSITIONS.auto = "Авто";
+FLOLIB_SHOWBORDERS = "Показывать края";
+FLOLIB_LAYOUT = "Планировка";
+FLOLIB_CONFIRM_RESET = "Вы действительно хотите сбросить '%s'? Интерфейс будет перезагружен.";
 
 end
 
