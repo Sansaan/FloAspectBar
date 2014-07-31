@@ -78,7 +78,6 @@ function FloAspectBar_OnEvent(self, event, ...)
 
 	elseif event == "VARIABLES_LOADED" then
 
-		FloAspectBar_MigrateVars();
 		FloAspectBar_CheckTalentGroup(FLOASPECTBAR_OPTIONS.active);
 
 		-- Hook the UIParent_ManageFramePositions function
@@ -146,40 +145,6 @@ function FloAspectBar_CheckTalentGroup(grp)
 	FloAspectBar_SetScale(ACTIVE_OPTIONS.scale);
 	FloAspectBar_SetBorders(nil, ACTIVE_OPTIONS.borders);
 
-end
-
-function FloAspectBar_MigrateVars()
-
-	-- Check new dual spec vars
-	if not FLOASPECTBAR_OPTIONS[1] then
-		local tmp = FLOASPECTBAR_OPTIONS;
-		FLOASPECTBAR_OPTIONS = { [1] = tmp };
-	end
-
-	-- Copy new variables
-	FloLib_CopyPreserve(FLOASPECTBAR_OPTIONS_DEFAULT, FLOASPECTBAR_OPTIONS);
-	if FLOASPECTBAR_OPTIONS[2] then
-		FloLib_CopyPreserve(FLOASPECTBAR_OPTIONS_DEFAULT[1], FLOASPECTBAR_OPTIONS[2]);
-	end
-
-	ACTIVE_OPTIONS = FLOASPECTBAR_OPTIONS[1];
-
-	-- Import old variables
-	if FLOASPECTBAR_LAYOUT then
-		ACTIVE_OPTIONS.barSettings.position = FLOASPECTBAR_LAYOUT;
-	elseif ACTIVE_OPTIONS.layout then
-		ACTIVE_OPTIONS.barSettings.position = ACTIVE_OPTIONS.layout;
-		ACTIVE_OPTIONS.layout = nil;
-	end
-	if FLOASPECTBAR_SCALE then
-		ACTIVE_OPTIONS.scale = FLOASPECTBAR_SCALE;
-	end
-	if FLOASPECTBAR_BUTTONS_ORDER then
-		ACTIVE_OPTIONS.barSettings.buttonsOrder = FLOASPECTBAR_BUTTONS_ORDER;
-	elseif ACTIVE_OPTIONS.buttonsOrder then
-		ACTIVE_OPTIONS.barSettings.buttonsOrder = ACTIVE_OPTIONS.buttonsOrder;
-		ACTIVE_OPTIONS.buttonsOrder = nil;
-	end
 end
 
 function FloAspectBar_ReadCmd(line)
