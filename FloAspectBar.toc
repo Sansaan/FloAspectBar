@@ -5,6 +5,6 @@
 ## OptionalDeps: 
 ## Dependencies:
 ## SavedVariables: 
-## SavedVariablesPerCharacter: FLOASPECTBAR_OPTIONS
+## SavedVariablesPerCharacter: FLOASPECTBAR_OPTIONS, FLOASPECTBAR_OPTIONS2
 FloLib.xml
 FloAspectBar.xml
