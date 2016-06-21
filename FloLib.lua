@@ -383,7 +383,7 @@ function FloLib_UpdateState(self)
                         cooldown:SetHideCountdownNumbers(false);
                         cooldown.currentCooldownType = COOLDOWN_TYPE_NORMAL;
                 end
-                CooldownFrame_SetTimer(cooldown, start, duration, enable, charges, maxCharges);
+                CooldownFrame_Set(cooldown, start, duration, enable, charges, maxCharges);
 
 		--Castable stuffs
 		normalTexture = _G[self:GetName().."Button"..i.."NormalTexture"];

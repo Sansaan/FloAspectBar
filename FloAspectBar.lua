@@ -59,7 +59,7 @@ function FloAspectBar_OnLoad(self)
 		SlashCmdList["FLOASPECTBAR"] = FloAspectBar_ReadCmd;
 
 		self:RegisterEvent("ADDON_LOADED");
-		self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED");
+		self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED");
 		self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED");
 	end
 
@@ -86,17 +86,18 @@ function FloAspectBar_OnEvent(self, event, arg1, ...)
 
 		-- Hook the UIParent_ManageFramePositions function
 		hooksecurefunc("UIParent_ManageFramePositions", FloAspectBar_UpdatePosition);
-		hooksecurefunc("SetActiveSpecGroup", function() changingSpec = true; end);
+		hooksecurefunc("SetSpecialization", function(specIndex, isPet) if not isPet then changingSpec = true end end);
 
 	elseif event == "UNIT_SPELLCAST_INTERRUPTED" then
 		local spellName = ...;
-		if arg1 == "player" and (spellName == FLOLIB_ACTIVATE_SPEC_1 or spellName == FLOLIB_ACTIVATE_SPEC_2) then
+		if arg1 == "player" and (spellName == FLOLIB_ACTIVATE_SPEC) then
 			changingSpec = false;
 		end
 
-	elseif event == "ACTIVE_TALENT_GROUP_CHANGED" then
-		if FLOASPECTBAR_OPTIONS.active ~= arg1 then
-			FloAspectBar_TalentGroupChanged(arg1);
+	elseif event == "PLAYER_SPECIALIZATION_CHANGED" then
+                local spec = GetSpecialization();
+		if arg1 == "player" and FLOASPECTBAR_OPTIONS.active ~= spec then
+			FloAspectBar_TalentGroupChanged(spec);
 		end
 
 	elseif event == "UPDATE_BINDINGS" then
