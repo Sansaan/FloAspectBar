@@ -72,6 +72,7 @@ function FloAspectBar_OnLoad(self)
 	self:RegisterEvent("ACTIONBAR_UPDATE_USABLE");
 	self:RegisterEvent("UNIT_AURA");
 	self:RegisterEvent("UPDATE_BINDINGS");
+	self:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player");
 end
 
 function FloAspectBar_OnEvent(self, event, arg1, ...)
@@ -87,6 +88,11 @@ function FloAspectBar_OnEvent(self, event, arg1, ...)
 		-- Hook the UIParent_ManageFramePositions function
 		hooksecurefunc("UIParent_ManageFramePositions", FloAspectBar_UpdatePosition);
 		hooksecurefunc("SetSpecialization", function(specIndex, isPet) if not isPet then changingSpec = true end end);
+
+	elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
+		if arg1 == "player" then
+			FloLib_StartTimer(self, ...);
+		end
 
 	elseif event == "UNIT_SPELLCAST_INTERRUPTED" then
 		local spellName = ...;
@@ -190,8 +196,9 @@ function FloAspectBar_SetupSpell(self, spell, pos)
 		icon:SetTexture(spell.texture);
 	end
 
-	self.spells[pos] = { name = spell.name };
-	self.spells[pos] = { id = spell.id, name = spell.name, addName = spell.addName, talented = spell.talented };
+	self.spells[pos] = { id = spell.id, name = spell.name, addName = spell.addName, talented = spell.talented, duration = spell.duration };
+
+        if spell.modifier then spell.modifier(self.spells[pos]) end
 
 end
 
