@@ -209,7 +209,9 @@ function FloAspectBar_UpdateState(self, pos)
 
 	if UnitBuff("player", spell.name) then
 		button:SetChecked(true);
-	else
+	elseif self["activeSpell"..pos] == pos then
+                FloLib_ResetTimer(self, pos);
+        else
 		button:SetChecked(false);
 	end
 end
