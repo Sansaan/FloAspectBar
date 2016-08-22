@@ -46,6 +46,7 @@ function FloAspectBar_OnLoad(self)
 
 	self.spells = {};
 	self.SetupSpell = FloAspectBar_SetupSpell;
+	self.OnSetup = FloAspectBar_OnSetup;
 	self.UpdateState = FloAspectBar_UpdateState;
 	self.menuHooks = { SetPosition = FloAspectBar_SetPosition, SetBorders = FloAspectBar_SetBorders };
 	self:EnableMouse(1);
@@ -200,6 +201,16 @@ function FloAspectBar_SetupSpell(self, spell, pos)
 
         if spell.modifier then spell.modifier(self.spells[pos]) end
 
+end
+
+function FloAspectBar_OnSetup(self)
+
+	if next(self.spells) == nil then
+		UnregisterStateDriver(self, "visibility")
+	else
+		local stateCondition = "nopetbattle,nooverridebar,novehicleui,nopossessbar"
+		RegisterStateDriver(self, "visibility", "["..stateCondition.."] show; hide")
+	end
 end
 
 function FloAspectBar_UpdateState(self, pos)
