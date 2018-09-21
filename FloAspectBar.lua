@@ -248,7 +248,7 @@ function FloAspectBar_UpdatePosition()
 		anchorFrame = MainMenuBar;
 
 		if SHOW_MULTI_ACTIONBAR_2 then
-			yOffset = yOffset + 45;
+			yOffset = yOffset + 40;
 		end
 	end
 
