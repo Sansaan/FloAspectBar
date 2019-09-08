@@ -6,7 +6,11 @@
 -- Constants
 -------------------------------------------------------------------------------
 
-local VERSION = "8.2.23"
+if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+	local VERSION = "8.2.23"
+elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+	local VERSION = "1.13.23"
+end
 
 -------------------------------------------------------------------------------
 -- Variables
