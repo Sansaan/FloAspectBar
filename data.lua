@@ -16,10 +16,10 @@ elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
 	FLO_ASPECT_SPELLS = {
 		["HUNTER"] = {
 			{ id = 13163 }, -- monkey
-			{ id = 13165, hasRanks = true }, -- hawk
+			{ id = 13165 }, -- hawk
 			{ id = 5118 }, -- cheetah
 			{ id = 13161 }, -- beast
-			{ id = 20043, hasRanks = true } -- nature
+			{ id = 20043 } -- nature
 		}
 	};
 end
