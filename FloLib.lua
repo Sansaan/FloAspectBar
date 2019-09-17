@@ -434,7 +434,7 @@ function FloLib_Button_SetTooltip(self)
 		-- get id of max rank
 		local _, _, _, _, _, _, maxRankId = GetSpellInfo(GetSpellInfo(spell.id));
 		--Display the tooltip
-		GameTooltip:SetSpellByID(spell.id);
+		GameTooltip:SetSpellByID(maxRankId);
 		GameTooltip:Show();
 	end
 end
