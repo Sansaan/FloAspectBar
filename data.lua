@@ -19,6 +19,7 @@ elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
 			{ id = 13165 }, -- hawk
 			{ id = 5118 }, -- cheetah
 			{ id = 13161 }, -- beast
+			{ id = 13159 }, -- pack
 			{ id = 20043 } -- nature
 		}
 	};
