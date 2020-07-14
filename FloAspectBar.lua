@@ -83,11 +83,8 @@ function FloAspectBar_OnLoad(self)
 		self:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED");
 	end
 
-	self:RegisterEvent("PLAYER_ENTERING_WORLD");
 	self:RegisterEvent("LEARNED_SPELL_IN_TAB");
 	self:RegisterEvent("CHARACTER_POINTS_CHANGED");
-	self:RegisterEvent("PLAYER_ALIVE");
-	self:RegisterEvent("PLAYER_LEVEL_UP");
 	self:RegisterEvent("SPELLS_CHANGED");
 	self:RegisterEvent("SPELL_UPDATE_COOLDOWN");
 	self:RegisterEvent("ACTIONBAR_UPDATE_USABLE");
@@ -98,9 +95,13 @@ end
 
 function FloAspectBar_OnEvent(self, event, arg1, ...)
 
-	if event == "PLAYER_ENTERING_WORLD" or event == "LEARNED_SPELL_IN_TAB" or event == "PLAYER_ALIVE" or event == "PLAYER_LEVEL_UP" or event == "CHARACTER_POINTS_CHANGED" or event == "SPELLS_CHANGED" then
+	if event == "LEARNED_SPELL_IN_TAB" or event == "CHARACTER_POINTS_CHANGED" or event == "SPELLS_CHANGED" then
 		if not changingSpec then
-			FloLib_Setup(self);
+			if GetSpecialization() ~= FLOTOTEMBAR_OPTIONS.active then
+				FloAspectBar_CheckTalentGroup(GetSpecialization());
+			else
+				FloLib_Setup(self);
+			end
 		end
 
 	elseif event == "ADDON_LOADED" and arg1 == "FloAspectBar" then
