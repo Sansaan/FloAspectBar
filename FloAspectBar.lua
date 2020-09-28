@@ -97,7 +97,7 @@ function FloAspectBar_OnEvent(self, event, arg1, ...)
 
 	if event == "LEARNED_SPELL_IN_TAB" or event == "CHARACTER_POINTS_CHANGED" or event == "SPELLS_CHANGED" then
 		if not changingSpec then
-			if GetSpecialization() ~= FLOTOTEMBAR_OPTIONS.active then
+			if GetSpecialization() ~= FLOASPECTBAR_OPTIONS.active then
 				FloAspectBar_CheckTalentGroup(GetSpecialization());
 			else
 				FloLib_Setup(self);
