@@ -67,6 +67,7 @@ function FloAspectBar_OnLoad(self)
 	self.menuHooks = { SetPosition = FloAspectBar_SetPosition, SetBorders = FloAspectBar_SetBorders };
 	self:EnableMouse(1);
 	PetActionBarFrame:EnableMouse(false);
+	ExtraActionBarFrame:EnableMouse(false);
 
 	if SHOW_WELCOME then
 		DEFAULT_CHAT_FRAME:AddMessage( "FloAspectBar "..VERSION.." loaded." );
