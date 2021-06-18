@@ -1,6 +1,6 @@
-## Interface: 90005
+## Interface: 20501
 ## Title: FloAspectBar
-## Author: Floraline
+## Author: Floraline, TBCC updates by Sansaan
 ## Notes: Add an aspect bar similar to the paladin's aura bar
 ## OptionalDeps: 
 ## Dependencies:

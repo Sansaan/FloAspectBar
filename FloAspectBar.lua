@@ -8,9 +8,9 @@
 
 local VERSION
 if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
-	VERSION = "9.0.28"
-elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
-	VERSION = "1.13.28"
+	VERSION = "8.3.27"
+elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC or WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
+	VERSION = "1.13.27"
 end
 
 -------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ local ACTIVE_OPTIONS = FLOASPECTBAR_OPTIONS[1];
 local changingSpec = false;
 
 local GetSpecialization = GetSpecialization;
-if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC or WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
 	GetSpecialization = function ()
 		return 1
 	end
@@ -50,7 +50,7 @@ function FloAspectBar_OnLoad(self)
 		return;
 	end
 
-	if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+	if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC or WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
 		self.hideCooldowns = true;
 	end
 
@@ -67,7 +67,6 @@ function FloAspectBar_OnLoad(self)
 	self.menuHooks = { SetPosition = FloAspectBar_SetPosition, SetBorders = FloAspectBar_SetBorders };
 	self:EnableMouse(1);
 	PetActionBarFrame:EnableMouse(false);
-	ExtraActionBarFrame:EnableMouse(false);
 
 	if SHOW_WELCOME then
 		DEFAULT_CHAT_FRAME:AddMessage( "FloAspectBar "..VERSION.." loaded." );

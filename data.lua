@@ -23,4 +23,16 @@ elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
 			{ id = 20043 } -- nature
 		}
 	};
+elseif WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
+	FLO_ASPECT_SPELLS = {
+		["HUNTER"] = {
+			{ id = 13163 }, -- monkey
+			{ id = 13165 }, -- hawk
+			{ id = 5118 }, -- cheetah
+			{ id = 13161 }, -- beast
+			{ id = 13159 }, -- pack
+			{ id = 20043 }, -- nature
+			{ id = 34074 }, -- viper
+		}
+	};
 end
