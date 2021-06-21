@@ -2,6 +2,7 @@
 ## Title: FloAspectBar
 ## Author: Floraline, TBCC updates by Sansaan
 ## Notes: Add an aspect bar similar to the paladin's aura bar
+## Version: 2.0
 ## OptionalDeps: 
 ## Dependencies:
 ## SavedVariables: 
